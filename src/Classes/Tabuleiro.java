@@ -45,11 +45,10 @@ public class Tabuleiro {
         // diagonais
         if(temSequenciaVencedor(tabuleiro[0][0], tabuleiro[1][1] ,tabuleiro[2][2])){
             return tabuleiro[0][0];
-        } else if(temSequenciaVencedor(tabuleiro[0][2], tabuleiro[1][1] ,tabuleiro[2][2])){
+        } else if(temSequenciaVencedor(tabuleiro[0][2], tabuleiro[1][1] ,tabuleiro[2][0])){
             return tabuleiro[0][2];
         }
 
-        // TODO talvez aqui teria que ter uma verificacao de empate tambem
         return Simbolo.VAZIO;
 
     }
@@ -61,6 +60,20 @@ public class Tabuleiro {
         } else{
             return false;
         }
+    }
+
+    // verificar Empate
+    public boolean verificarEmpate(){
+        for (int i = 0; i < tabuleiro.length; i++) {
+            for (int j = 0; j < tabuleiro[i].length; j++) {
+                if(tabuleiro[i][j] == Simbolo.VAZIO){
+                    return false;
+                }
+
+            }
+        }
+
+        return true;
     }
 
     // reiniciar campos
