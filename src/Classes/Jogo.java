@@ -1,10 +1,15 @@
 package Classes;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Jogo {
     Tabuleiro tabuleiro = new Tabuleiro();
     Jogador jogador1;
     Jogador jogador2;
     boolean jogoFinalizado = false;
+    ArrayList<jogoObservador> observadores = new ArrayList<>();
 
     Jogador jogadorAtual;
 
@@ -15,10 +20,20 @@ public class Jogo {
 
     }
 
+    public void registrarObservador(jogoObservador observador){
+        observadores.add(observador);
+    }
+
+    public void notificarObservador(int linha , int coluna, Simbolo simbolo){
+        observadores.forEach(observador -> observador.jogadaRealizada(linha, coluna, simbolo));
+    }
+
+
     public void Jogada(int Linha , int Coluna){
 
         if(!jogoFinalizado){
             if(tabuleiro.marcar(Linha, Coluna, jogadorAtual.getSimbolo())){
+                notificarObservador(Linha, Coluna, jogadorAtual.getSimbolo());
 
                 if (tabuleiro.verificarVitoria() != Simbolo.VAZIO){
                     System.out.println("Jogo finalizado");
