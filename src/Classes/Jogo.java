@@ -1,15 +1,13 @@
 package Classes;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Jogo {
     Tabuleiro tabuleiro = new Tabuleiro();
     Jogador jogador1;
     Jogador jogador2;
-    boolean jogoFinalizado = false;
     ArrayList<jogoObservador> observadores = new ArrayList<>();
+    EstadoDaPartida estado;
 
     Jogador jogadorAtual;
 
@@ -17,31 +15,31 @@ public class Jogo {
         this.jogador1 = jogador1;
         this.jogador2 = jogador2;
         this.jogadorAtual = jogador1;
-
+        estado = EstadoDaPartida.EM_ANDAMENTO;
     }
 
     public void registrarObservador(jogoObservador observador){
         observadores.add(observador);
     }
 
-    public void notificarObservador(int linha , int coluna, Simbolo simbolo){
-        observadores.forEach(observador -> observador.jogadaRealizada(linha, coluna, simbolo));
+    public void notificarObservador(EventoJogo eventoJogo){
+        observadores.forEach(observador -> observador.jogadaRealizada(eventoJogo));
     }
 
 
     public void Jogada(int Linha , int Coluna){
 
-        if(!jogoFinalizado){
-            if(tabuleiro.marcar(Linha, Coluna, jogadorAtual.getSimbolo())){
-                notificarObservador(Linha, Coluna, jogadorAtual.getSimbolo());
+        if(estado != EstadoDaPartida.EMPATE && estado != EstadoDaPartida.VITORIA){
+            Simbolo simboloDaJogada = jogadorAtual.getSimbolo();
+            if(tabuleiro.marcar(Linha, Coluna, simboloDaJogada)){
 
                 if (tabuleiro.verificarVitoria() != Simbolo.VAZIO){
                     System.out.println("Jogo finalizado");
                     System.out.println(jogadorAtual.getNome() + " venceu a partida");
-                    jogoFinalizado = true;
+                    estado = EstadoDaPartida.VITORIA;
                 } else if (tabuleiro.verificarEmpate()) {
                     System.out.println("Jogo Empatado");
-                    jogoFinalizado = true;
+                    estado = EstadoDaPartida.EMPATE;
                 } else {
                     if(jogadorAtual == jogador1){
                         jogadorAtual = jogador2;
@@ -49,6 +47,9 @@ public class Jogo {
                         jogadorAtual = jogador1;
                     }
                 }
+
+                notificarObservador(new EventoJogo(Linha, Coluna, simboloDaJogada, jogadorAtual, estado , TipoEventoJogo.JOGADA));
+
             } else{
                 System.out.println("Jogada Indevida");
             }
@@ -58,8 +59,11 @@ public class Jogo {
     public void reiniciar(){
         tabuleiro.reiniciar();
         jogadorAtual = jogador1;
-        jogoFinalizado = false;
+        estado = EstadoDaPartida.EM_ANDAMENTO;
         System.out.println("Jogo reiniciado");
+
+        notificarObservador(new EventoJogo(-1 , -1 , Simbolo.VAZIO, jogadorAtual, estado , TipoEventoJogo.REINICIO));
+
     }
 
 

@@ -1,6 +1,7 @@
 package Visoes;
 
 import Classes.Jogo;
+import Classes.TipoEventoJogo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +29,19 @@ public class PainelTabuleiro extends JPanel {
             }
         }
 
-        novoJogo.registrarObservador((linha1, coluna1, simbolo) -> matriz[linha1][coluna1].setText(String.valueOf(simbolo)));
+        novoJogo.registrarObservador(eventoJogo-> {
+            if(eventoJogo.getTipoEventoJogo() == TipoEventoJogo.JOGADA){
+                matriz[eventoJogo.getLinha()][eventoJogo.getColuna()].setText(String.valueOf(eventoJogo.getSimbolo()));
+            } else if(eventoJogo.getTipoEventoJogo() == TipoEventoJogo.REINICIO){
+
+                for (int linha = 0; linha < 3; linha++) {
+                    for (int coluna = 0; coluna < 3; coluna++) {
+                        matriz[linha][coluna].setText("");
+                    }
+                }
+
+            }
+        });
+
     }
 }
